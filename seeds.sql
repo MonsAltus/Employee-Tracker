@@ -1,4 +1,4 @@
-USE employeesDB;
+USE employees_db;
 
 -- DEPARTMENT SEEDS
 INSERT INTO department (id, name)
