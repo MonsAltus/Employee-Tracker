@@ -2,7 +2,7 @@ USE employees_db;
 
 -- DEPARTMENT SEEDS
 INSERT INTO department (id, name)
-VALUES (1, 'Development');
+VALUES (1, 'Software Development');
 
 INSERT INTO department (id, name)
 VALUES (2, 'Marketing');
