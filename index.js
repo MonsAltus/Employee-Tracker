@@ -60,11 +60,9 @@ function exit() {
 function viewEmployee() {
     console.log('/////VIEW EMPLOYEES/////')
     var sqlquery = 'SELECT * FROM employee';
-    // var sqlquery = 'SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, concat(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY ID ASC';
     connection.query(sqlquery, (err, res) => {
         if (err) throw err;
         console.table(res)
-        // connnection.end()
         mainMenu();
     }) 
 };
@@ -72,7 +70,12 @@ function viewEmployee() {
 // VIEW ALL ROLES
 function viewRoles() {
     console.log('/////VIEW ROLES/////')
-
+    var sqlquery = 'SELECT * FROM role';
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        mainMenu();
+    }) 
 };
 
 // VIEW ALL DEPARTMENTS
@@ -82,10 +85,14 @@ function viewDepartments() {
     connection.query(sqlquery, (err, res) => {
         if (err) throw err;
         console.table(res)
-        // connnection.end()
         mainMenu();
     }) 
 };
+
+
+///////////////////////////////////////////
+// WORK BELOW HERE:
+
 
 // ADD NEW EMPLOYEE
 function addEmployee() {
@@ -113,7 +120,6 @@ function addEmployee() {
             message: 'Does this employee have a manager?',
             choices: ['Yes', 'No']            
         },
-
         // if hasManager === yes, ask managerName
         {
             type: 'list',
@@ -127,7 +133,7 @@ function addEmployee() {
 // CREATE ROLE ARRAY
 function listRoles() {
     var roleArray = [];
-    connection.query('SELECT * FROM role', (err, res) => {
+    connection.query('SELECT id, title FROM role ORDER BY TITLE ASC', (err, res) => {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
             roleArray.push(res[i].title);
@@ -151,7 +157,7 @@ function listDepartments() {
 // ADD NEW ROLE
 function addRole() {
     console.log('/////ADD ROLE/////')
-    let departmentArray = [];
+    let departmentArray = listDepartments();
     connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role", (err, res) => {
         inquirer.prompt ([
             {
@@ -169,10 +175,9 @@ function addRole() {
                 name: 'department',
                 message: 'Enter department for this role:',
                 // return array from listDeparments function as choices
-                choices: listDepartments(),
+                choices: departmentArray,
             },
         ]).then();
-        });
     });
 };
 
