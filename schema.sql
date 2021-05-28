@@ -1,7 +1,7 @@
 -- SCHEMA
--- DROP DATABASE IF EXISTS employees_db;
--- CREATE DATABASE employees_db;
-USE employees_db;
+DROP DATABASE IF EXISTS employeedb;
+CREATE DATABASE employeedb;
+USE employeedb;
 
 -- EMPLOYEE TABLE
 CREATE TABLE employee (
@@ -32,6 +32,8 @@ CREATE TABLE role (
     FOREIGN KEY (department_id) REFERENCES department(id)
 );
 
-SELECT * FROM department;
-SELECT * FROM role;
-SELECT * FROM employee;
+
+
+-- SELECT * FROM department;
+-- SELECT * FROM role;
+-- SELECT * FROM employee;
