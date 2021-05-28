@@ -1,19 +1,27 @@
+require('dotenv').config()
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const consoleTable = require('console.table');
-require('dotenv')
+// const consoleTable = require('console.table');
+
 
 const connection = mysql.createConnection({
     user: 'root',
     database: 'employees_db',
     host: 'localhost',
+    // Create a .env or replace the value below with your password to use locally.
     password: process.env.DB_PASS,
     port: 3306,
 });
 
-connection.connect()
+// Create connection with MySQL localhost
+connection.connect((err) => {
+    if (err) throw err;
+    mainMenu();
+})
+
 
 function mainMenu() {
+    console.log('/////EMPLOYEE TRACKER/////')
     inquirer.prompt([
         {
             type: 'list',
@@ -44,29 +52,44 @@ function mainMenu() {
 };
 
 function exit() {
-    console.log('Goodbye')
+    console.log('Exiting Application. Goodbye.')
     process.exit()
 }
 
+// VIEW ALL EMPLOYEES
 function viewEmployee() {
-
-};
-
-function viewRoles() {
-
-};
-
-function viewDepartments() {
-    var sqlquery = 'SELECT * FROM department';
+    console.log('/////VIEW EMPLOYEES/////')
+    var sqlquery = 'SELECT * FROM employee';
+    // var sqlquery = 'SELECT e.id, e.first_name, e.last_name, role.title, department.name AS department, role.salary, concat(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY ID ASC';
     connection.query(sqlquery, (err, res) => {
         if (err) throw err;
         console.table(res)
-        connnection.end()
+        // connnection.end()
+        mainMenu();
     }) 
 };
 
+// VIEW ALL ROLES
+function viewRoles() {
+    console.log('/////VIEW ROLES/////')
 
+};
+
+// VIEW ALL DEPARTMENTS
+function viewDepartments() {
+    console.log('/////VIEW DEPARTMENTS/////')
+    var sqlquery = 'SELECT name FROM department';
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        // connnection.end()
+        mainMenu();
+    }) 
+};
+
+// ADD NEW EMPLOYEE
 function addEmployee() {
+    console.log('/////ADD EMPLOYEE/////');
     inquirer.prompt ([
         {
             type: 'input',
@@ -79,35 +102,109 @@ function addEmployee() {
             message: 'Enter last name:',
         },
         {
-            type: 'input',
+            type: 'choice',
             name: 'role',
-            message: 'Enter role:',
+            message: 'Select role:',
+            choices: listRoles(),
         },
         {
-            type: 'input',
-            name: 'lastName',
-            message: 'Enter department:',
+            type: 'choice',
+            name: 'hasManager',
+            message: 'Does this employee have a manager?',
+            choices: ['Yes', 'No']            
         },
 
-        //Choose salary
-        //Choose manager
-    ]);
+        // if hasManager === yes, ask managerName
+        {
+            type: 'list',
+            name: 'managerName',
+            message: 'Select Manager:',
+            choices: '',
+        },
+    ]).then()
 };
 
+// CREATE ROLE ARRAY
+function listRoles() {
+    var roleArray = [];
+    connection.query('SELECT * FROM role', (err, res) => {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+            roleArray.push(res[i].title);
+        };
+    });
+    return roleArray;
+};
+
+// CREATE DEPARTMENT ARRAY
+function listDepartments() {
+    let departmentArray = [];
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+            departmentArray.push(res[i].title);
+        };
+    });
+    return departmentArray;
+};
+
+// ADD NEW ROLE
 function addRole() {
-
+    console.log('/////ADD ROLE/////')
+    let departmentArray = [];
+    connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role", (err, res) => {
+        inquirer.prompt ([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'Enter new role name:',
+            },
+            {
+                type: 'number',
+                name: 'salary',
+                message: 'Enter salary for this role:',
+            },
+            {
+                type: 'list',
+                name: 'department',
+                message: 'Enter department for this role:',
+                // return array from listDeparments function as choices
+                choices: listDepartments(),
+            },
+        ]).then();
+        });
+    });
 };
 
+// ADD NEW DEPARTMENT
 function addDepartment() {
-
+    console.log('/////ADD DEPARTMENT/////')
+    inquirer.prompt ([
+        {
+            type: 'input',
+            name: 'department',
+            message: 'Enter new department name:',
+        },
+    ]).then((res) => {
+        connection.query(
+            'INSERT INTO department SET ?',
+            {
+                name: res.department,
+            },
+            (err) => {
+                if (err) throw err
+                console.table(res);
+                mainMenu();
+            }
+        );
+    });
 };
 
+// CHANGE EMPLOYEE ROLE
 function changeRole() {
+    console.log('/////CHANGE EMPLOYEE ROLE/////')
 
 };
-
-
-
 
 // Run application
-mainMenu()
+// mainMenu()
