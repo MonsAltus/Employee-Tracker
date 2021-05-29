@@ -27,7 +27,7 @@ function mainMenu() {
             type: 'list',
             name: 'mainMenu',
             message: 'Choose an option:',
-            choices: ['View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
+            choices: ['TEST QUERY', 'RUN LIST ROLES', 'RUN LIST DEPTS', 'View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
         },
     ]).then((answers) => {
         switch (answers.mainMenu) {
@@ -47,6 +47,14 @@ function mainMenu() {
                 return changeRole();
             case '- Exit Application -':
                 return exit();
+//////////////////////////// TESTING //////////////////////////////////////
+            case 'RUN LIST ROLES':
+                return listRoles();
+            case 'RUN LIST DEPTS':
+                return listDepartments();
+            case 'TEST QUERY':
+                return testQuery();
+///////////////////////////// TESTING //////////////////////////////////////
             default:
                 return exit();
         } 
@@ -92,36 +100,39 @@ function viewDepartments() {
     }) 
 };
 
-
-///////////////////////////////////////////
-// WORK BELOW HERE:
-
 // CREATE ROLE ARRAY
 function listRoles() {
-    var roleArray = [];
-    connection.query('SELECT id, title FROM role ORDER BY TITLE ASC', (err, res) => {
-    // connection.query('SELECT * FROM role', (err, res) => {
+    let roleArray = [];
+    // var sqlquery = 'SELECT id, title FROM role ORDER BY TITLE ASC';
+    var sqlquery = 'SELECT name FROM role';
+    connection.query(sqlquery, (err, res) => {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
             roleArray.push(res[i].title);
         };
+    console.table(res)
     });
+    console.log(roleArray);
     return roleArray;
 };
 
 // CREATE DEPARTMENT ARRAY
 function listDepartments() {
     let departmentArray = [];
-    connection.query('SELECT name FROM department', (err, res) => {
+    connection.query('SELECT id, name FROM department', (err, res) => {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
             departmentArray.push(res[i].title);
         };
-    // console.table(res)
+    console.table(res)
     });
     console.log(departmentArray)
     return departmentArray;
 };
+
+
+///////////////////////////////////////////
+// WORK BELOW HERE:
 
 // ADD NEW EMPLOYEE
 function addEmployee() {
@@ -141,7 +152,8 @@ function addEmployee() {
             type: 'choice',
             name: 'role',
             message: 'Select role:',
-            choices: listRoles(),
+            // choices: listRoles(),
+            choices: ['test1', 'test2'],
         },
         {
             type: 'choice',
@@ -154,16 +166,36 @@ function addEmployee() {
             type: 'list',
             name: 'managerName',
             message: 'Select Manager:',
-            choices: '',
+            choices: ['TEST'],
+            when: (answers) => answers.hasManager === 'Yes'
         },
-    ]).then()
+    ]).then((res) => {
+        console.log(res)
+    });
 };
+
+
+////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
+function testQuery() {
+    // var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, employee.id AS ID, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e.first_name, " " ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id LEFT JOIN employee e on employee.manager_id = e.id ORDER BY employee.first_name ASC';
+    // var sqlquery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id';
+    var sqlQuery = 'SELECT '
+    
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        mainMenu();
+    });
+};
+////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
+
 
 // ADD NEW ROLE
 function addRole() {
     console.log('/////  ADD A NEW ROLE  /////')
-    let departmentArray = listDepartments();
-    connection.query("SELECT role.title AS title, role.salary AS salary, role.department_id AS departmentId FROM role", (err, res) => {
+    // let departmentArray = listDepartments();
+    var sqlQuery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id'
+    connection.query(sqlQuery, (err, res) => {
         inquirer.prompt ([
             {
                 type: 'input',
@@ -177,13 +209,27 @@ function addRole() {
             },
             {
                 type: 'list',
-                name: 'department',
+                name: 'departmentId',
                 message: 'Enter department for this role:',
                 // return array from listDeparments function as choices
                 // choices: departmentArray,
                 choices: listDepartments(),
             },
-        ]).then();
+        ]).then((res) => {
+            connection.query(
+                'INSERT INTO role SET ?',
+                {
+                    title: res.title,
+                    salary: res.salary,
+                    department_id: res.departmentId
+                },
+                (err) => {
+                    if (err) throw err
+                    // console.table(res);
+                    mainMenu();
+                }
+            );
+        });
     });
 };
 
@@ -205,7 +251,7 @@ function addDepartment() {
             },
             (err) => {
                 if (err) throw err
-                console.table(res);
+                // console.table(res);
                 mainMenu();
             }
         );
