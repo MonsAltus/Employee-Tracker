@@ -4,7 +4,7 @@
 ![license-badge](https://shields.io/github/license/MonsAltus/Employee-Tracker)
 
 ## Description:
-This application is a Content Managment System for a MySQL database of employee data. Employtee data can be added or viewed, including their roles, departments, and salary.
+This application is a Content Managment System for a MySQL database of employee data. Data includes Name, title, salary, department, and manager. Employee data can displayed sorted alphabetically, by role, or by department. New employees, roles, and departments can be added. Existing employees' roles can be changed.
 
 ## Table of Contents:
 [User Story](#User-Story)<br>
@@ -23,6 +23,7 @@ This application is a Content Managment System for a MySQL database of employee 
 ## Installation:
 If you want to use or develop this application locally, clone the repository and install dependencies by running `npm i` in your terminal in the root folder.
 Start the application by running `node app` into you terminal in the root folder.
+The MySQL connection uses a `.env` to hold a password. Create a `.env` file or replace with field in `index.js` with a hardcoded password.
 
 ## Usage:
 [GIF of app functionality](./assets/preview1.gif)<br>
