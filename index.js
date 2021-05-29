@@ -30,6 +30,7 @@ function mainMenu() {
             choices: ['View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
         },
     ]).then((answers) => {
+        // Handle user selection with switch function.
         switch (answers.mainMenu) {
             case 'View employees':
                 return viewEmployee();
@@ -47,16 +48,6 @@ function mainMenu() {
                 return changeRole();
             case '- Exit Application -':
                 return exit();
-//////////////////////////// TESTING //////////////////////////////////////
-            // case 'RUN LIST ROLES':
-            //     return listRoles();
-            // case 'RUN LIST DEPTS':
-            //     return listDepartments();
-            // case 'RUN LIST EMPLOYEES':
-            //     return listEmployees();
-            // case 'TEST QUERY':
-            //     return testQuery();
-///////////////////////////// TESTING //////////////////////////////////////
             default:
                 return exit();
         } 
@@ -211,8 +202,6 @@ function addEmployee() {
         );
     });
 };
-
-
 
 // ADD NEW ROLE
 function addRole() {
