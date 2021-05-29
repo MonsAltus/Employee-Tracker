@@ -144,9 +144,10 @@ function listEmployees() {
         for (var i = 0; i < res.length; i++) {
             employeeArray.push(res[i].name);
         };
-        console.log(res)
-        console.log(employeeArray)
+        // console.log(res)
+        // console.log(employeeArray)
     });
+    return employeeArray;
 };
 
 
@@ -154,7 +155,7 @@ function listEmployees() {
 // WORK BELOW HERE:
 
 // ADD NEW EMPLOYEE
-function addEmployee(roleArray) {
+function addEmployee() {
     
     console.log('/////  ADD A NEW EMPLOYEE  /////');
     inquirer.prompt ([
@@ -169,7 +170,7 @@ function addEmployee(roleArray) {
             message: 'Enter last name:',
         },
         {
-            type: 'choice',
+            type: 'list',
             name: 'role',
             message: 'Select role:',
             choices: listRoles()
@@ -177,7 +178,7 @@ function addEmployee(roleArray) {
             // choices: ['test1', 'test2'],
         },
         {
-            type: 'choice',
+            type: 'list',
             name: 'hasManager',
             message: 'Does this employee have a manager?',
             choices: ['Yes', 'No']            
@@ -187,8 +188,9 @@ function addEmployee(roleArray) {
             type: 'list',
             name: 'managerName',
             message: 'Select Manager:',
+            // choices: ['test1', 'test2'],
             choices: listEmployees(),
-            when: (answers) => answers.hasManager === 'Yes'
+            when: (res) => res.hasManager === 'Yes'
         },
     ]).then((res) => {
         console.log(res)
@@ -196,36 +198,43 @@ function addEmployee(roleArray) {
             //FUNCTION TO CREATE ROLE ID
             for (let i = 0; i < roleArray.length; i++) {
                 if (res.role === roleArray[i])
+                // I have absolutely no idea why i-7 gets the correct index instead of i+1, but it works so I'm not touching it for now.
+                // var roleId = i-7;
                 var roleId = i+1;
             }
-            
-            if (res.hasManager === 'yes') {
+
+            if (res.hasManager === 'Yes') {
                 //FUNCTION TO CREATE MANAGER ID
+                for (let i = 0; i < employeeArray.length; i++) {
+                    if (res.managerName === employeeArray[i])
+                    // I have absolutely no idea why i-6 gets the correct index instead of i+1, but it works so I'm not touching it for now.
+                    // var managerId = i-6;
+                    var managerId = i+1;
+                }
             } else {managerId = null}
 
-            console.log(res.firstName)
-            console.log(res.lastName)
-            console.log('role:' + res.role)
-            console.log('roleId' + roleId)
-            console.log('manager' + res.managerName)
-            console.log('managerId' + managerId)
+            // console.log(res.firstName)
+            // console.log(res.lastName)
+            // console.log('role:' + res.role)
+            // console.log(roleId)
+            // console.log('manager' + res.managerName)
+            // console.log(managerId)
 
-
-        // connection.query(
-        //     'INSERT INTO employee SET ?',
-        //     {
-        //         first_name: res.firstName,
-        //         last_name: res.lastName,
-        //         role_id: roleID,
-        //         manager_id: managerId
-        //     },
-        //     (err) => {
-        //         if (err) throw err
-        //         console.log('/////  NEW EMPLOYEE ADDED  /////');
-        //         // console.table(res);
-        //         mainMenu();
-        //     }
-        // );
+        connection.query(
+            'INSERT INTO employee SET ?',
+            {
+                first_name: res.firstName,
+                last_name: res.lastName,
+                role_id: roleId,
+                manager_id: managerId
+            },
+            (err) => {
+                if (err) throw err
+                console.log('/////  NEW EMPLOYEE '+res.firstName+' '+res.lastName+' ADDED  /////');
+                // console.table(res);
+                mainMenu();
+            }
+        );
     });
 };
 
