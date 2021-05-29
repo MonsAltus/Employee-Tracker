@@ -233,21 +233,6 @@ function addEmployee() {
 };
 
 
-////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
-function testQuery() {
-    // var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, employee.id AS ID, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e.first_name, " " ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id LEFT JOIN employee e on employee.manager_id = e.id ORDER BY employee.first_name ASC';
-    // var sqlquery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id';
-    var sqlQuery = 'SELECT '
-    
-    connection.query(sqlquery, (err, res) => {
-        if (err) throw err;
-        console.table(res)
-        console.log(res)
-        mainMenu();
-    });
-};
-////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
-
 
 // ADD NEW ROLE
 function addRole() {
@@ -320,7 +305,7 @@ function addDepartment() {
             },
             (err) => {
                 if (err) throw err
-                console.log('/////  NEW DEPARTMENT ADDED  /////');
+                console.log('/////  NEW DEPARTMENT '+res.department+' ADDED  /////');
                 // console.table(res);
                 mainMenu();
             }
@@ -330,44 +315,77 @@ function addDepartment() {
 
 // CHANGE EMPLOYEE ROLE
 function changeRole() {
-    console.log('/////  UPDATE AN EMPLOEE\'S ROLE /////')
+    console.log('/////  UPDATE AN EMPLOYEE ROLE /////')
     inquirer.prompt ([
         {
+            // Inquirer doesn't like long list as a first prompt, so this is a workaround.
+            // type: 'confirm',
+            name: 'hackyFix',
+            message: 'Press enter to continue:',
+        },
+        {
             type: 'list',
-            name: 'selectEmployee',
+            name: 'employee',
             message: 'Select Employee to update:',
             choices: listEmployees(),
-            // choices: ['test3', 'test4'],
         },
         {
             type: 'list',
             name: 'newRole',
             message: 'Select new role:',
             choices: listRoles(),
-            // choices: ['test1', 'test2'],
         },
     ]).then((res) => {
-            console.log(res)
-        // //FUNCTION TO CREATE ROLE ID
-        // for (let i = 0; i < roleArray.length; i++) {
-        //     if (res.newRole === roleArray[i])
-        //     var roleId = i+1;
-        // }
-        // //FUNCTION TO CREATE MANAGER ID
-        // for (let i = 0; i < employeeArray.length; i++) {
-        //     if (res.employee === employeeArray[i])
-        //     var employeeId = i+1;
-        // }
+            // console.log(res)
+        // CREATE ROLE ID
+        for (let i = 0; i < roleArray.length; i++) {
+            if (res.newRole === roleArray[i])
+            var roleId = i+1;
+        }
+        // CREATE MANAGER ID
+        for (let i = 0; i < employeeArray.length; i++) {
+            if (res.employee === employeeArray[i])
+            var employeeId = i+1;
+        }
+        
+        console.log(res.employee)
+        console.log(res.newRole)
+        console.log(roleId)
+        console.log(employeeId)
+
+
     // UPDATE EMPLOYEE NEW ROLE ID
-        // var roleId = 2
-        // var employeeId = 4
-    // var sqlquery = 'UPDATE employee SET role-id = '+roleId+' WHERE id = '+employeeId
-    //     connection.query(sqlquery, (err, res) => {
-    //     if (err) throw err
-    //     console.log('/////  EMPLOYEE '+res.employee+' ROLE UPDATED TO '+res.newRole+'  /////')
-    //     });
+        // var roleId = 1
+        // var employeeId = 15
+
+
+        var sqlquery = 'UPDATE employee SET role_id='+roleId+' WHERE id='+employeeId;
+        connection.query(sqlquery, (err) => {
+            if (err) throw err
+            console.log('/////  EMPLOYEE '+res.employee+' ROLE UPDATED TO '+res.newRole+'  /////');
+            // console.log('/////  EMPLOYEE ROLE UPDATED  /////');
+            mainMenu();
+        });
     });
 };
+
+
+////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
+function testQuery() {
+    // var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, employee.id AS ID, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e.first_name, " " ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id LEFT JOIN employee e on employee.manager_id = e.id ORDER BY employee.first_name ASC';
+    // var sqlquery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id';
+    var sqlQuery = 'SELECT '
+    
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        console.log(res)
+        mainMenu();
+    });
+};
+////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
+
+
 
 // Run application
 // mainMenu()
