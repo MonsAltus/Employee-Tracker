@@ -27,7 +27,7 @@ function mainMenu() {
             type: 'list',
             name: 'mainMenu',
             message: 'Choose an option:',
-            choices: ['View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
+            choices: ['TEST QUERY', 'RUN LIST EMPLOYEES', 'RUN LIST ROLES', 'RUN LIST DEPTS', 'View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
         },
     ]).then((answers) => {
         switch (answers.mainMenu) {
@@ -47,6 +47,16 @@ function mainMenu() {
                 return changeRole();
             case '- Exit Application -':
                 return exit();
+//////////////////////////// TESTING //////////////////////////////////////
+            case 'RUN LIST ROLES':
+                return listRoles();
+            case 'RUN LIST DEPTS':
+                return listDepartments();
+            case 'RUN LIST EMPLOYEES':
+                return listEmployees();
+            case 'TEST QUERY':
+                return testQuery();
+///////////////////////////// TESTING //////////////////////////////////////
             default:
                 return exit();
         } 
@@ -92,36 +102,57 @@ function viewDepartments() {
     }) 
 };
 
-
-///////////////////////////////////////////
-// WORK BELOW HERE:
-
-// CREATE ROLE ARRAY
+// // CREATE ROLE ARRAY
+var roleArray = [];
 function listRoles() {
-    var roleArray = [];
-    connection.query('SELECT id, title FROM role ORDER BY TITLE ASC', (err, res) => {
-    // connection.query('SELECT * FROM role', (err, res) => {
+    var sqlquery = 'SELECT id, title FROM role';
+    connection.query(sqlquery, (err, res) => {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
             roleArray.push(res[i].title);
         };
+    // console.log(roleArray);
+    // console.table(res)
+    // console.log(res)
     });
     return roleArray;
 };
 
 // CREATE DEPARTMENT ARRAY
+var departmentArray = [];
 function listDepartments() {
-    let departmentArray = [];
-    connection.query('SELECT name FROM department', (err, res) => {
+    var sqlquery = 'SELECT id, name FROM department';
+    connection.query(sqlquery, (err, res) => {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
-            departmentArray.push(res[i].title);
+            departmentArray.push(res[i].name);
+            // deptIdArray.push(res[i].id);
         };
+        // console.log(res[2].name)
+    // console.log(departmentArray)
     // console.table(res)
     });
-    console.log(departmentArray)
     return departmentArray;
 };
+
+// CREATE EMPLOYEE ARRAY
+var employeeArray = [];
+function listEmployees() {
+    var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS name FROM employee';
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+            employeeArray.push(res[i].name);
+        };
+        // console.log(res)
+        // console.log(employeeArray)
+    });
+    return employeeArray;
+};
+
+
+///////////////////////////////////////////
+// WORK BELOW HERE:
 
 // ADD NEW EMPLOYEE
 function addEmployee() {
@@ -138,13 +169,15 @@ function addEmployee() {
             message: 'Enter last name:',
         },
         {
-            type: 'choice',
+            type: 'list',
             name: 'role',
             message: 'Select role:',
-            choices: listRoles(),
+            choices: listRoles()
+            // choices: roleArray,
+            // choices: ['test1', 'test2'],
         },
         {
-            type: 'choice',
+            type: 'list',
             name: 'hasManager',
             message: 'Does this employee have a manager?',
             choices: ['Yes', 'No']            
@@ -154,16 +187,59 @@ function addEmployee() {
             type: 'list',
             name: 'managerName',
             message: 'Select Manager:',
-            choices: '',
+            // choices: ['test1', 'test2'],
+            choices: listEmployees(),
+            when: (res) => res.hasManager === 'Yes'
         },
-    ]).then()
+    ]).then((res) => {
+        console.log(res)
+            //FUNCTION TO CREATE ROLE ID
+            for (let i = 0; i < roleArray.length; i++) {
+                if (res.role === roleArray[i])
+                var roleId = i+1;
+            }
+
+            if (res.hasManager === 'Yes') {
+                //FUNCTION TO CREATE MANAGER ID
+                for (let i = 0; i < employeeArray.length; i++) {
+                    if (res.managerName === employeeArray[i])
+                    var managerId = i+1;
+                }
+            } else {managerId = null}
+
+            // console.log(res.firstName)
+            // console.log(res.lastName)
+            // console.log('role:' + res.role)
+            // console.log(roleId)
+            // console.log('manager' + res.managerName)
+            // console.log(managerId)
+
+        connection.query(
+            'INSERT INTO employee SET ?',
+            {
+                first_name: res.firstName,
+                last_name: res.lastName,
+                role_id: roleId,
+                manager_id: managerId
+            },
+            (err) => {
+                if (err) throw err
+                console.log('/////  NEW EMPLOYEE '+res.firstName+' '+res.lastName+' ADDED  /////');
+                // console.table(res);
+                mainMenu();
+            }
+        );
+    });
 };
+
+
 
 // ADD NEW ROLE
 function addRole() {
     console.log('/////  ADD A NEW ROLE  /////')
-    let departmentArray = listDepartments();
-    connection.query("SELECT role.title AS title, role.salary AS salary, role.department_id AS departmentId FROM role", (err, res) => {
+    // let departmentArray = listDepartments();
+    // var sqlQuery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id'
+    // connection.query(sqlQuery, (err, res) => {
         inquirer.prompt ([
             {
                 type: 'input',
@@ -180,11 +256,36 @@ function addRole() {
                 name: 'department',
                 message: 'Enter department for this role:',
                 // return array from listDeparments function as choices
-                // choices: departmentArray,
                 choices: listDepartments(),
             },
-        ]).then();
-    });
+        ]).then((res) => {
+            
+            for (let i = 0; i < departmentArray.length; i++) {
+                if (res.department === departmentArray[i])
+                var departmentId = i+1;
+            }
+
+            // console.log(res.title)
+            // console.log(res.salary)
+            // console.log(res.department)
+            // console.log(departmentId)
+
+            connection.query(
+                'INSERT INTO role SET ?',
+                {
+                    title: res.title,
+                    salary: res.salary,
+                    department_id: departmentId
+                },
+                (err) => {
+                    if (err) throw err
+                    console.log('/////  NEW ROLE '+res.title+' ADDED  /////');
+                    // console.table(res);
+                    mainMenu();
+                }
+            );
+        });
+    // });
 };
 
 // ADD NEW DEPARTMENT
@@ -200,12 +301,12 @@ function addDepartment() {
         connection.query(
             'INSERT INTO department SET ?',
             {
-                
                 name: res.department,
             },
             (err) => {
                 if (err) throw err
-                console.table(res);
+                console.log('/////  NEW DEPARTMENT '+res.department+' ADDED  /////');
+                // console.table(res);
                 mainMenu();
             }
         );
@@ -214,9 +315,77 @@ function addDepartment() {
 
 // CHANGE EMPLOYEE ROLE
 function changeRole() {
-    console.log('/////  CHANGE AN EMPLOYEE\'S ROLE  /////')
+    console.log('/////  UPDATE AN EMPLOYEE ROLE /////')
+    inquirer.prompt ([
+        {
+            // Inquirer doesn't like long list as a first prompt, so this is a workaround.
+            // type: 'confirm',
+            name: 'hackyFix',
+            message: 'Press enter to continue:',
+        },
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Select Employee to update:',
+            choices: listEmployees(),
+        },
+        {
+            type: 'list',
+            name: 'newRole',
+            message: 'Select new role:',
+            choices: listRoles(),
+        },
+    ]).then((res) => {
+            // console.log(res)
+        // CREATE ROLE ID
+        for (let i = 0; i < roleArray.length; i++) {
+            if (res.newRole === roleArray[i])
+            var roleId = i+1;
+        }
+        // CREATE MANAGER ID
+        for (let i = 0; i < employeeArray.length; i++) {
+            if (res.employee === employeeArray[i])
+            var employeeId = i+1;
+        }
+        
+        console.log(res.employee)
+        console.log(res.newRole)
+        console.log(roleId)
+        console.log(employeeId)
 
+
+    // UPDATE EMPLOYEE NEW ROLE ID
+        // var roleId = 1
+        // var employeeId = 15
+
+
+        var sqlquery = 'UPDATE employee SET role_id='+roleId+' WHERE id='+employeeId;
+        connection.query(sqlquery, (err) => {
+            if (err) throw err
+            console.log('/////  EMPLOYEE '+res.employee+' ROLE UPDATED TO '+res.newRole+'  /////');
+            // console.log('/////  EMPLOYEE ROLE UPDATED  /////');
+            mainMenu();
+        });
+    });
 };
+
+
+////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
+function testQuery() {
+    // var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, employee.id AS ID, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e.first_name, " " ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id LEFT JOIN employee e on employee.manager_id = e.id ORDER BY employee.first_name ASC';
+    // var sqlquery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id';
+    var sqlQuery = 'SELECT '
+    
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        console.log(res)
+        mainMenu();
+    });
+};
+////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
+
+
 
 // Run application
 // mainMenu()
