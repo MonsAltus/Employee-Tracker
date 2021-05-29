@@ -156,7 +156,6 @@ function listEmployees() {
 
 // ADD NEW EMPLOYEE
 function addEmployee() {
-    
     console.log('/////  ADD A NEW EMPLOYEE  /////');
     inquirer.prompt ([
         {
@@ -194,12 +193,9 @@ function addEmployee() {
         },
     ]).then((res) => {
         console.log(res)
-
             //FUNCTION TO CREATE ROLE ID
             for (let i = 0; i < roleArray.length; i++) {
                 if (res.role === roleArray[i])
-                // I have absolutely no idea why i-7 gets the correct index instead of i+1, but it works so I'm not touching it for now.
-                // var roleId = i-7;
                 var roleId = i+1;
             }
 
@@ -207,8 +203,6 @@ function addEmployee() {
                 //FUNCTION TO CREATE MANAGER ID
                 for (let i = 0; i < employeeArray.length; i++) {
                     if (res.managerName === employeeArray[i])
-                    // I have absolutely no idea why i-6 gets the correct index instead of i+1, but it works so I'm not touching it for now.
-                    // var managerId = i-6;
                     var managerId = i+1;
                 }
             } else {managerId = null}
@@ -259,8 +253,8 @@ function testQuery() {
 function addRole() {
     console.log('/////  ADD A NEW ROLE  /////')
     // let departmentArray = listDepartments();
-    var sqlQuery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id'
-    connection.query(sqlQuery, (err, res) => {
+    // var sqlQuery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id'
+    // connection.query(sqlQuery, (err, res) => {
         inquirer.prompt ([
             {
                 type: 'input',
@@ -300,13 +294,13 @@ function addRole() {
                 },
                 (err) => {
                     if (err) throw err
-                    console.log('/////  NEW ROLE ADDED  /////');
+                    console.log('/////  NEW ROLE '+res.title+' ADDED  /////');
                     // console.table(res);
                     mainMenu();
                 }
             );
         });
-    });
+    // });
 };
 
 // ADD NEW DEPARTMENT
@@ -336,8 +330,43 @@ function addDepartment() {
 
 // CHANGE EMPLOYEE ROLE
 function changeRole() {
-    console.log('/////  CHANGE AN EMPLOYEE\'S ROLE  /////')
-
+    console.log('/////  UPDATE AN EMPLOEE\'S ROLE /////')
+    inquirer.prompt ([
+        {
+            type: 'list',
+            name: 'selectEmployee',
+            message: 'Select Employee to update:',
+            choices: listEmployees(),
+            // choices: ['test3', 'test4'],
+        },
+        {
+            type: 'list',
+            name: 'newRole',
+            message: 'Select new role:',
+            choices: listRoles(),
+            // choices: ['test1', 'test2'],
+        },
+    ]).then((res) => {
+            console.log(res)
+        // //FUNCTION TO CREATE ROLE ID
+        // for (let i = 0; i < roleArray.length; i++) {
+        //     if (res.newRole === roleArray[i])
+        //     var roleId = i+1;
+        // }
+        // //FUNCTION TO CREATE MANAGER ID
+        // for (let i = 0; i < employeeArray.length; i++) {
+        //     if (res.employee === employeeArray[i])
+        //     var employeeId = i+1;
+        // }
+    // UPDATE EMPLOYEE NEW ROLE ID
+        // var roleId = 2
+        // var employeeId = 4
+    // var sqlquery = 'UPDATE employee SET role-id = '+roleId+' WHERE id = '+employeeId
+    //     connection.query(sqlquery, (err, res) => {
+    //     if (err) throw err
+    //     console.log('/////  EMPLOYEE '+res.employee+' ROLE UPDATED TO '+res.newRole+'  /////')
+    //     });
+    });
 };
 
 // Run application
