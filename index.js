@@ -319,7 +319,6 @@ function changeRole() {
     inquirer.prompt ([
         {
             // Inquirer doesn't like long list as a first prompt, so this is a workaround.
-            // type: 'confirm',
             name: 'hackyFix',
             message: 'Press enter to continue:',
         },
@@ -336,13 +335,12 @@ function changeRole() {
             choices: listRoles(),
         },
     ]).then((res) => {
-            // console.log(res)
-        // CREATE ROLE ID
+        // Find role_id
         for (let i = 0; i < roleArray.length; i++) {
             if (res.newRole === roleArray[i])
             var roleId = i+1;
         }
-        // CREATE MANAGER ID
+        // Find employee id
         for (let i = 0; i < employeeArray.length; i++) {
             if (res.employee === employeeArray[i])
             var employeeId = i+1;
@@ -353,39 +351,12 @@ function changeRole() {
         console.log(roleId)
         console.log(employeeId)
 
-
-    // UPDATE EMPLOYEE NEW ROLE ID
-        // var roleId = 1
-        // var employeeId = 15
-
-
+    // Update employee with new role_id
         var sqlquery = 'UPDATE employee SET role_id='+roleId+' WHERE id='+employeeId;
         connection.query(sqlquery, (err) => {
             if (err) throw err
             console.log('/////  EMPLOYEE '+res.employee+' ROLE UPDATED TO '+res.newRole+'  /////');
-            // console.log('/////  EMPLOYEE ROLE UPDATED  /////');
             mainMenu();
         });
     });
 };
-
-
-////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
-function testQuery() {
-    // var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, employee.id AS ID, role.title AS Title, department.name AS Department, role.salary AS Salary, CONCAT(e.first_name, " " ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id LEFT JOIN employee e on employee.manager_id = e.id ORDER BY employee.first_name ASC';
-    // var sqlquery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id';
-    var sqlQuery = 'SELECT '
-    
-    connection.query(sqlquery, (err, res) => {
-        if (err) throw err;
-        console.table(res)
-        console.log(res)
-        mainMenu();
-    });
-};
-////////////// TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY TEST QUERY ///////////////////////////
-
-
-
-// Run application
-// mainMenu()

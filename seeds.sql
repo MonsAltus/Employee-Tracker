@@ -23,11 +23,11 @@ INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Vera'
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Annika', 'Ramirez', 2, 5);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Jermaine', 'Dotson', 2, 5);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Tyla', 'Talbot', 3, null);
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Amit', 'Lancaster', 4, null);
+INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Kaitlan', 'Haines', 6, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Avery', 'Michael', 4, null);
+INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Amit', 'Lancaster', 4, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Hector', 'Moyer', 5, 6);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Douglas', 'Byrne', 5, 6);
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Kaitlan', 'Haines', 6, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Andy', 'Rivera', 7, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Skylar', 'Rasmussen', 7, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('Cairon', 'Chung', 8, null);
