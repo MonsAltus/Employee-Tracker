@@ -6,7 +6,7 @@ const consoleTable = require('console.table');
 // Declaring connection variables.
 const connection = mysql.createConnection({
     user: 'root',
-    database: 'employee_db',
+    database: 'employees_db',
     host: 'localhost',
     // Create a .env or replace the value below with your password to use locally.
     password: process.env.DB_PASS,
