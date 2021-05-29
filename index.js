@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
     user: 'root',
     database: 'employees_db',
     host: 'localhost',
-    // Create a .env or replace the value below with your password to use locally.
+    // Create a .env with password or replace the value below with your password to use locally.
     password: process.env.DB_PASS,
     port: 3306,
 });
@@ -27,7 +27,7 @@ function mainMenu() {
             type: 'list',
             name: 'mainMenu',
             message: 'Choose an option:',
-            choices: ['TEST QUERY', 'RUN LIST EMPLOYEES', 'RUN LIST ROLES', 'RUN LIST DEPTS', 'View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
+            choices: ['View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
         },
     ]).then((answers) => {
         switch (answers.mainMenu) {
@@ -48,14 +48,14 @@ function mainMenu() {
             case '- Exit Application -':
                 return exit();
 //////////////////////////// TESTING //////////////////////////////////////
-            case 'RUN LIST ROLES':
-                return listRoles();
-            case 'RUN LIST DEPTS':
-                return listDepartments();
-            case 'RUN LIST EMPLOYEES':
-                return listEmployees();
-            case 'TEST QUERY':
-                return testQuery();
+            // case 'RUN LIST ROLES':
+            //     return listRoles();
+            // case 'RUN LIST DEPTS':
+            //     return listDepartments();
+            // case 'RUN LIST EMPLOYEES':
+            //     return listEmployees();
+            // case 'TEST QUERY':
+            //     return testQuery();
 ///////////////////////////// TESTING //////////////////////////////////////
             default:
                 return exit();
@@ -102,7 +102,8 @@ function viewDepartments() {
     }) 
 };
 
-// // CREATE ROLE ARRAY
+// CREATE ROLE ARRAY
+// Returns array from the title column on role table.
 var roleArray = [];
 function listRoles() {
     var sqlquery = 'SELECT id, title FROM role';
@@ -112,13 +113,12 @@ function listRoles() {
             roleArray.push(res[i].title);
         };
     // console.log(roleArray);
-    // console.table(res)
-    // console.log(res)
     });
     return roleArray;
 };
 
 // CREATE DEPARTMENT ARRAY
+// Returns array from the name column on department table.
 var departmentArray = [];
 function listDepartments() {
     var sqlquery = 'SELECT id, name FROM department';
@@ -126,16 +126,14 @@ function listDepartments() {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
             departmentArray.push(res[i].name);
-            // deptIdArray.push(res[i].id);
         };
-        // console.log(res[2].name)
     // console.log(departmentArray)
-    // console.table(res)
     });
     return departmentArray;
 };
 
 // CREATE EMPLOYEE ARRAY
+// Returns array of full names from the employee table.
 var employeeArray = [];
 function listEmployees() {
     var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS name FROM employee';
@@ -144,15 +142,9 @@ function listEmployees() {
         for (var i = 0; i < res.length; i++) {
             employeeArray.push(res[i].name);
         };
-        // console.log(res)
-        // console.log(employeeArray)
     });
     return employeeArray;
 };
-
-
-///////////////////////////////////////////
-// WORK BELOW HERE:
 
 // ADD NEW EMPLOYEE
 function addEmployee() {
@@ -172,9 +164,8 @@ function addEmployee() {
             type: 'list',
             name: 'role',
             message: 'Select role:',
+            // return array from listRoles function as choices
             choices: listRoles()
-            // choices: roleArray,
-            // choices: ['test1', 'test2'],
         },
         {
             type: 'list',
@@ -182,40 +173,30 @@ function addEmployee() {
             message: 'Does this employee have a manager?',
             choices: ['Yes', 'No']            
         },
-        // if hasManager === yes, ask managerName
         {
+            // if hasManager === yes, ask managerName
             type: 'list',
             name: 'managerName',
             message: 'Select Manager:',
-            // choices: ['test1', 'test2'],
             choices: listEmployees(),
             when: (res) => res.hasManager === 'Yes'
         },
     ]).then((res) => {
         console.log(res)
-            //FUNCTION TO CREATE ROLE ID
+            //Find role_id
             for (let i = 0; i < roleArray.length; i++) {
                 if (res.role === roleArray[i])
                 var roleId = i+1;
             }
-
+            //If new employee has a manager, find manager_id
             if (res.hasManager === 'Yes') {
-                //FUNCTION TO CREATE MANAGER ID
                 for (let i = 0; i < employeeArray.length; i++) {
                     if (res.managerName === employeeArray[i])
                     var managerId = i+1;
                 }
             } else {managerId = null}
-
-            // console.log(res.firstName)
-            // console.log(res.lastName)
-            // console.log('role:' + res.role)
-            // console.log(roleId)
-            // console.log('manager' + res.managerName)
-            // console.log(managerId)
-
-        connection.query(
-            'INSERT INTO employee SET ?',
+        // Adds new data to employee table.
+        connection.query('INSERT INTO employee SET ?',
             {
                 first_name: res.firstName,
                 last_name: res.lastName,
@@ -225,7 +206,6 @@ function addEmployee() {
             (err) => {
                 if (err) throw err
                 console.log('/////  NEW EMPLOYEE '+res.firstName+' '+res.lastName+' ADDED  /////');
-                // console.table(res);
                 mainMenu();
             }
         );
@@ -236,56 +216,44 @@ function addEmployee() {
 
 // ADD NEW ROLE
 function addRole() {
-    console.log('/////  ADD A NEW ROLE  /////')
-    // let departmentArray = listDepartments();
-    // var sqlQuery = 'SELECT role.title AS title, role.salary AS salary, department.name AS departmentName, department.id AS departmentId FROM role INNER JOIN department on department.id = role.department_id'
-    // connection.query(sqlQuery, (err, res) => {
-        inquirer.prompt ([
-            {
-                type: 'input',
-                name: 'title',
-                message: 'Enter new role name:',
-            },
-            {
-                type: 'number',
-                name: 'salary',
-                message: 'Enter salary for this role:',
-            },
-            {
-                type: 'list',
-                name: 'department',
-                message: 'Enter department for this role:',
-                // return array from listDeparments function as choices
-                choices: listDepartments(),
-            },
-        ]).then((res) => {
-            
-            for (let i = 0; i < departmentArray.length; i++) {
-                if (res.department === departmentArray[i])
-                var departmentId = i+1;
-            }
-
-            // console.log(res.title)
-            // console.log(res.salary)
-            // console.log(res.department)
-            // console.log(departmentId)
-
-            connection.query(
-                'INSERT INTO role SET ?',
-                {
-                    title: res.title,
-                    salary: res.salary,
-                    department_id: departmentId
-                },
-                (err) => {
-                    if (err) throw err
-                    console.log('/////  NEW ROLE '+res.title+' ADDED  /////');
-                    // console.table(res);
-                    mainMenu();
-                }
-            );
+console.log('/////  ADD A NEW ROLE  /////')
+    inquirer.prompt ([
+        {
+            type: 'input',
+            name: 'title',
+            message: 'Enter new role name:',
+        },
+        {
+            type: 'number',
+            name: 'salary',
+            message: 'Enter salary for this role:',
+        },
+        {
+            type: 'list',
+            name: 'department',
+            message: 'Enter department for this role:',
+            // return array from listDeparments function as choices
+            choices: listDepartments(),
+        },
+    ]).then((res) => {
+        // Find department_id
+        for (let i = 0; i < departmentArray.length; i++) {
+        if (res.department === departmentArray[i])
+        var departmentId = i+1;
+    }
+    // Add new data to role table.
+    connection.query('INSERT INTO role SET ?',
+        {
+            title: res.title,
+            salary: res.salary,
+            department_id: departmentId
+        },
+        (err) => {
+            if (err) throw err
+            console.log('/////  NEW ROLE '+res.title+' ADDED  /////');
+            mainMenu();
         });
-    // });
+    });
 };
 
 // ADD NEW DEPARTMENT
@@ -298,6 +266,7 @@ function addDepartment() {
             message: 'Enter new department name:',
         },
     ]).then((res) => {
+        // Add new data to department table.
         connection.query(
             'INSERT INTO department SET ?',
             {
@@ -306,7 +275,6 @@ function addDepartment() {
             (err) => {
                 if (err) throw err
                 console.log('/////  NEW DEPARTMENT '+res.department+' ADDED  /////');
-                // console.table(res);
                 mainMenu();
             }
         );
@@ -315,10 +283,10 @@ function addDepartment() {
 
 // CHANGE EMPLOYEE ROLE
 function changeRole() {
-    console.log('/////  UPDATE AN EMPLOYEE ROLE /////')
+    console.log('/////  UPDATE AN EMPLOYEE\'S ROLE /////')
     inquirer.prompt ([
         {
-            // Inquirer doesn't like long list as a first prompt, so this is a workaround.
+            // Inquirer doesn't like a long list as a first prompt, so this is a workaround.
             name: 'hackyFix',
             message: 'Press enter to continue:',
         },
@@ -326,6 +294,7 @@ function changeRole() {
             type: 'list',
             name: 'employee',
             message: 'Select Employee to update:',
+            // return array from listEmployees function as choices
             choices: listEmployees(),
         },
         {
@@ -345,13 +314,7 @@ function changeRole() {
             if (res.employee === employeeArray[i])
             var employeeId = i+1;
         }
-        
-        console.log(res.employee)
-        console.log(res.newRole)
-        console.log(roleId)
-        console.log(employeeId)
-
-    // Update employee with new role_id
+        // Update employee with new role_id
         var sqlquery = 'UPDATE employee SET role_id='+roleId+' WHERE id='+employeeId;
         connection.query(sqlquery, (err) => {
             if (err) throw err
