@@ -27,7 +27,7 @@ function mainMenu() {
             type: 'list',
             name: 'mainMenu',
             message: 'Choose an option:',
-            choices: ['View employees', 'View employees by role', 'View employees by department', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
+            choices: ['View employees', 'View employees by role', 'View employees by department', 'View Roles', 'View Departments', 'Add a new employee', 'Add a new role', 'Add a new department', 'Change an employee\'s role', '- Exit Application -']
         },
     ]).then((answers) => {
         // Handle user selection with switch function.
@@ -35,8 +35,12 @@ function mainMenu() {
             case 'View employees':
                 return viewEmployee();
             case 'View employees by role':
-                return viewRoles();
+                return viewEmplByRole();
             case 'View employees by department':
+                return viewEmplByDepartment();
+            case 'View Roles':
+                return viewRoles();
+            case 'View Departments':
                 return viewDepartments();
             case 'Add a new employee':
                 return addEmployee();
@@ -72,7 +76,7 @@ function viewEmployee() {
 };
 
 // VIEW ALL EMPLOYEES BY ROLE
-function viewRoles() {
+function viewEmplByRole() {
     console.log('/////  VIEWING EMPLOYEES BY ROLE  /////')
     var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id ORDER BY role.title ASC';
     connection.query(sqlquery, (err, res) => {
@@ -83,9 +87,31 @@ function viewRoles() {
 };
 
 // VIEW ALL EMPLOYEES BY DEPARTMENT
-function viewDepartments() {
+function viewEmplByDepartment() {
     console.log('/////  VIEWING EMPLOYEES BY DEPARTMENT  /////')
     var sqlquery = 'SELECT CONCAT(employee.first_name, " " ,employee.last_name) AS Name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY department.name ASC';
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        mainMenu();
+    }) 
+};
+
+// VIEW ALL ROLES
+function viewRoles() {
+    console.log('/////  VIEWING ALL ROLES  /////')
+    var sqlquery = 'SELECT id, title FROM role ORDER BY id ASC';
+    connection.query(sqlquery, (err, res) => {
+        if (err) throw err;
+        console.table(res)
+        mainMenu();
+    }) 
+};
+
+// VIEW ALL DEPARTMENTS
+function viewDepartments() {
+    console.log('/////  VIEWING ALL DEPARTMENTS  /////')
+    var sqlquery = 'SELECT id, name FROM department ORDER BY id ASC';
     connection.query(sqlquery, (err, res) => {
         if (err) throw err;
         console.table(res)
@@ -173,7 +199,7 @@ function addEmployee() {
             when: (res) => res.hasManager === 'Yes'
         },
     ]).then((res) => {
-        console.log(res)
+        // console.log(res)
             //Find role_id
             for (let i = 0; i < roleArray.length; i++) {
                 if (res.role === roleArray[i])
