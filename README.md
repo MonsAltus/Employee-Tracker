@@ -21,12 +21,14 @@ This application is a Content Managment System for a MySQL database of employee 
 - SO THAT I can organize and plan my business
 
 ## Installation:
-If you want to use or develop this application locally, clone the repository and install dependencies by running `npm i` in your terminal in the root folder.
-Start the application by running `node app` into you terminal in the root folder.
-The MySQL connection uses a `.env` to hold a password. Create a `.env` file or replace with field in `index.js` with a hardcoded password.
+If you want to use or develop this application locally, clone the repository and install dependencies by running `npm i` in your terminal in the root folder.<br>
+Start the application by running `node index` in your terminal in the root folder.<br>
+The MySQL connection uses a `.env` to hold a password. Create a `.env` file or replace with field in `index.js` with a hardcoded password.<br>
 
 ## Usage:
-[GIF of app functionality](./assets/preview1.gif)<br>
+Displaying all employees ordered alphabetically:<br>
+![Image of app functionality](./assets/preview1.png)<br>
+Adding a new employee:<br>
 ![Image of app functionality](./assets/preview2.png)<br>
 
 ## Tests:
